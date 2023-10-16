@@ -2,31 +2,51 @@
 
 namespace Pmguru\Framework\Routing;
 
-use FastRoute\Dispatcher;
-use FastRoute\RouteCollector;
+use FastRoute\{Dispatcher, RouteCollector};
+use League\Container\Container;
 use Pmguru\Framework\Http\Exceptions\MethodNotAllowedException;
 use Pmguru\Framework\Http\Exceptions\RouteNotFoundException;
 use Pmguru\Framework\Http\Request;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use function FastRoute\simpleDispatcher;
 
 class Router implements RouterInterface
 {
 	
+	private array $routes;
+	
 	/**
-	 * @throws RouteNotFoundException
+	 * @param Request $request
+	 * @param Container $container
+	 * @return array
 	 * @throws MethodNotAllowedException
+	 * @throws RouteNotFoundException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
 	 */
-	public function dispatch( Request $request )
+	public function dispatch( Request $request, Container $container )
 	: array
 	{
 		[$handler, $vars] = $this->extractRouteInfo( $request );
 		
 		if ( is_array( $handler ) ) {
-			[$controller, $method] = $handler;
-			$handler = [new $controller, $method];
+			[$controllerId, $method] = $handler;
+			$controller = $container->get($controllerId);
+			$handler = [$controller, $method];
 		}
 		
 		return [$handler, $vars];
+	}
+	
+	/**
+	 * @param array $routes
+	 * @return void
+	 */
+	public function registerRoutes( array $routes )
+	: void
+	{
+		$this->routes = $routes;
 	}
 	
 	/**
@@ -37,9 +57,7 @@ class Router implements RouterInterface
 	: array
 	{
 		$dispatcher = simpleDispatcher( function ( RouteCollector $collector ) {
-			$routes = include BASE_PATH . '/routes/web.php';
-			
-			foreach ( $routes as $route ) {
+			foreach ( $this->routes as $route ) {
 				$collector->addRoute( ...$route );
 			}
 		} );
