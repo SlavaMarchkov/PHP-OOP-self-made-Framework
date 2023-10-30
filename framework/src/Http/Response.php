@@ -6,7 +6,7 @@ class Response
 {
 	
 	public function __construct(
-		private readonly mixed $content,
+		private string $content = '',
 		private readonly int   $statusCode = 200,
 		private readonly array $headers = [],
 	)
@@ -18,6 +18,13 @@ class Response
 	: void
 	{
 		echo $this->content;
+	}
+	
+	public function setContent( string $content )
+	: static
+	{
+		$this->content = $content;
+		return $this;
 	}
 	
 }

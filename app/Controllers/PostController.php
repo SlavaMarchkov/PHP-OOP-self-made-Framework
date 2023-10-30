@@ -2,16 +2,24 @@
 
 namespace App\Controllers;
 
+use Pmguru\Framework\Controllers\AbstractController;
 use Pmguru\Framework\Http\Response;
 
-class PostController
+class PostController extends AbstractController
 {
 	
 	public function show( int $id )
 	: Response
 	{
-		$content = "<h1>Post - $id</h1>";
-		return new Response( $content );
+		return $this->render( 'posts.html.twig', [
+			'postId' => $id
+		] );
+	}
+	
+	public function create()
+	: Response
+	{
+		return $this->render( 'create_post.html.twig' );
 	}
 	
 }

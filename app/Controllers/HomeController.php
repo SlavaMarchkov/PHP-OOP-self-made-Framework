@@ -3,9 +3,10 @@
 namespace App\Controllers;
 
 use App\Services\YouTubeService;
+use Pmguru\Framework\Controllers\AbstractController;
 use Pmguru\Framework\Http\Response;
 
-class HomeController
+class HomeController extends AbstractController
 {
 	
 	public function __construct(
@@ -17,9 +18,9 @@ class HomeController
 	public function index()
 	: Response
 	{
-		$content = '<h1>Hello, World!</h1>';
-		$content .= '<a href="' . $this->youTubeService->getChannelUrl() . '">YouTube Channel</a>';
-		return new Response( $content );
+		return $this->render( 'home.html.twig', [
+			'youTubeChannel' => $this->youTubeService->getChannelUrl(),
+		] );
 	}
 	
 }

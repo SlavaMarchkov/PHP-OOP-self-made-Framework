@@ -15,7 +15,8 @@
   "require": {
     "nikic/fast-route": "^1.3",
     "league/container": "^4.2.0",
-    "symfony/dotenv": "^v6.3.0"
+    "symfony/dotenv": "^6.3.0",
+    "twig/twig": "^3.7.1"
   },
   "require-dev": {
     "phpunit/phpunit": "10.5.x-dev",
