@@ -2,6 +2,7 @@
 
 namespace Pmguru\Framework\Http;
 
+use Doctrine\DBAL\Connection;
 use Exception;
 use League\Container\Container;
 use Pmguru\Framework\Http\Exceptions\HttpException;
@@ -35,6 +36,10 @@ class Kernel
 		try {
 			// проверка выброса исключения
 			// throw new Exception('Some fatal error');
+			
+			// проверка подключения к БД
+			// dd($this->container->get(Connection::class));
+			// dd($this->container->get(Connection::class)->connect());
 			
 			[$routeHandler, $vars] = $this->router->dispatch( $request, $this->container );
 			$response = call_user_func_array( $routeHandler, $vars );

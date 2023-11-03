@@ -2,7 +2,6 @@
 
 use App\Controllers\HomeController;
 use App\Controllers\PostController;
-use Pmguru\Framework\Http\Response;
 use Pmguru\Framework\Routing\Route;
 
 return [
