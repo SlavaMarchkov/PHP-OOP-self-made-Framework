@@ -8,12 +8,13 @@ return new class {
 	public function up( Schema $schema )
 	: void
 	{
-		$table = $schema->createTable( 'comments' );
+		$table = $schema->createTable( 'posts' );
 		$table->addColumn( 'id', Types::INTEGER, [
 			'unsigned'      => true,
 			'autoincrement' => true,
 		] );
-		$table->addColumn( 'content', Types::TEXT );
+		$table->addColumn( 'title', Types::STRING );
+		$table->addColumn( 'body', Types::TEXT );
 		$table->addColumn( 'created_at', Types::DATETIME_IMMUTABLE, [
 			'default' => 'CURRENT_TIMESTAMP'
 		] );

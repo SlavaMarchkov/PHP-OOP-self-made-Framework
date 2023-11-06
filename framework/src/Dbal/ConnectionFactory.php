@@ -22,9 +22,11 @@ class ConnectionFactory
 	: Connection
 	{
 		try {
-			return DriverManager::getConnection( [
+			$connection = DriverManager::getConnection( [
 				'url' => $this->databaseUrl,
 			] );
+			$connection->setAutoCommit(false);
+			return $connection;
 		} catch ( Exception $e ) {
 			throw new Exception('Error connecting to Database: ' . $e->getMessage(), 400);
 		}

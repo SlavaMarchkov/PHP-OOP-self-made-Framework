@@ -6,6 +6,7 @@ use League\Container\Argument\Literal\StringArgument;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
 use Pmguru\Framework\Console\Application;
+use Pmguru\Framework\Console\Commands\MigrateCommand;
 use Pmguru\Framework\Controllers\AbstractController;
 use Pmguru\Framework\Dbal\ConnectionFactory;
 use Pmguru\Framework\Http\Kernel;
@@ -78,5 +79,9 @@ $container->add( Application::class )
 $container->add( ConsoleKernel::class )
 	->addArgument( $container )
 	->addArgument( Application::class );
+
+$container->add( 'console:migrate', MigrateCommand::class )
+	->addArgument( Connection::class )
+	->addArgument( new StringArgument( BASE_PATH . '/database/migrations' ) );
 
 return $container;
