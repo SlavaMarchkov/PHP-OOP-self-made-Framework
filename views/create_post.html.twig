@@ -1,16 +1,30 @@
-{% extends 'default.html.twig' %}
+{% extends 'layouts/default.html.twig' %}
 
 {% block main %}
     <div class="bg-body-tertiary p-5 rounded">
-        <form>
+        <form action="/posts" method="post">
             <div class="mb-3">
                 <label for="title" class="form-label">Заголовок</label>
-                <input type="text" class="form-control" id="title" aria-describedby="titleHelp">
+                <input
+                        type="text"
+                        name="title"
+                        class="form-control"
+                        id="title"
+                        aria-describedby="titleHelp"
+                        value="Lorem ipsum dolor sit amet, consectetur."
+                        required
+                >
                 <div id="titleHelp" class="form-text">Дайте своему посту броский заголовок.</div>
             </div>
             <div class="mb-3">
-                <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                <label for="body" class="form-label">Контент</label>
+                <textarea
+                        class="form-control"
+                        name="body"
+                        id="body"
+                        rows="7"
+                        required
+                >Это электронное письмо было отправлено с вашего веб-сайта https://granmulino.com и является сводкой по деятельности, связанной с безопасностью, которую Wordfence отслеживает за период с 13.11.2023 по 20.11.2023. ПРИМЕЧАНИЕ: Вы используете бесплатную версию Wordfence и упускаете возможности, такие как обновления правил брандмауэра и сигнатур в реальном времени, блокировка стран, а также обнаружение отправки спама с вашего IP-адреса сайта. Щёлкните здесь, чтобы перейти на премиум-версию Wordfence сейчас.</textarea>
             </div>
             <button type="submit" class="btn btn-primary">Добавить</button>
         </form>

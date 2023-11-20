@@ -4,6 +4,7 @@ namespace Pmguru\Framework\Routing;
 
 use FastRoute\{Dispatcher, RouteCollector};
 use League\Container\Container;
+use Pmguru\Framework\Controllers\AbstractController;
 use Pmguru\Framework\Http\Exceptions\MethodNotAllowedException;
 use Pmguru\Framework\Http\Exceptions\RouteNotFoundException;
 use Pmguru\Framework\Http\Request;
@@ -32,7 +33,12 @@ class Router implements RouterInterface
 		
 		if ( is_array( $handler ) ) {
 			[$controllerId, $method] = $handler;
-			$controller = $container->get($controllerId);
+			$controller = $container->get( $controllerId );
+			
+			if ( is_subclass_of( $controller, AbstractController::class ) ) {
+				$controller->setRequest( $request );
+			}
+			
 			$handler = [$controller, $method];
 		}
 		
@@ -73,11 +79,11 @@ class Router implements RouterInterface
 			case Dispatcher::METHOD_NOT_ALLOWED:
 				$allowedMethods = implode( ', ', $routeInfo[1] );
 				$e = new MethodNotAllowedException( "Supported HTTP methods: $allowedMethods" );
-				$e->setStatusCode(405);
+				$e->setStatusCode( 405 );
 				throw $e;
 			default:
 				$e = new RouteNotFoundException( 'Route not found' );
-				$e->setStatusCode(404);
+				$e->setStatusCode( 404 );
 				throw $e;
 		}
 	}

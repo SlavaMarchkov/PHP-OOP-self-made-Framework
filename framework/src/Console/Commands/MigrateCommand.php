@@ -31,6 +31,8 @@ class MigrateCommand implements CommandInterface
 	: int
 	{
 		try {
+			$this->connection->setAutoCommit(false);
+			
 			// 1. Создать таблицу миграций (migrations), если таковая ещё не создана
 			$this->createMigrationsTable();
 			
@@ -73,6 +75,7 @@ class MigrateCommand implements CommandInterface
 			throw new \Exception( $exception );
 		}
 		
+		$this->connection->setAutoCommit(true);
 		return 0;
 	}
 	
