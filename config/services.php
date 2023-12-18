@@ -7,19 +7,23 @@ use League\Container\Container;
 use League\Container\ReflectionContainer;
 use Pmguru\Framework\Console\Application;
 use Pmguru\Framework\Console\Commands\MigrateCommand;
+use Pmguru\Framework\Console\Kernel as ConsoleKernel;
 use Pmguru\Framework\Controllers\AbstractController;
 use Pmguru\Framework\Dbal\ConnectionFactory;
 use Pmguru\Framework\Http\Kernel;
-use Pmguru\Framework\Console\Kernel as ConsoleKernel;
+use Pmguru\Framework\Http\Middleware\RequestHandler;
+use Pmguru\Framework\Http\Middleware\RequestHandlerInterface;
+use Pmguru\Framework\Http\Middleware\RouterDispatch;
 use Pmguru\Framework\Routing\Router;
 use Pmguru\Framework\Routing\RouterInterface;
+use Pmguru\Framework\Session\Session;
+use Pmguru\Framework\Session\SessionInterface;
+use Pmguru\Framework\Template\TwigFactory;
 use Symfony\Component\Dotenv\Dotenv;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
 // подключение переменных окружения
 $dotenv = new Dotenv();
-$dotenv->load( BASE_PATH . '/.env' );
+$dotenv->load(BASE_PATH . '/.env');
 
 // Application parameters
 $routes = include BASE_PATH . '/routes/web.php';
@@ -32,56 +36,75 @@ $databaseUrl = 'pdo-mysql://root@localhost:3306/php_framework?charset=utf8mb4';
 $container = new Container();
 
 // подключаем делегирование
-$container->delegate( new ReflectionContainer( true ) );
+$container->delegate(new ReflectionContainer(true));
 
 // добавляем пространство имен
-$container->add( 'framework-commands-namespace', new StringArgument( 'Pmguru\\Framework\\Console\\Commands\\' ) );
+$container->add('framework-commands-namespace', new StringArgument('Pmguru\\Framework\\Console\\Commands\\'));
 
 // добавляем переменную окружения типа string
-$container->add( 'APP_ENV', new StringArgument( $appEnv ) );
+$container->add('APP_ENV', new StringArgument($appEnv));
 
 // добавляем в него Router
-$container->add( RouterInterface::class, Router::class );
+$container->add(RouterInterface::class, Router::class);
 
 // расширяем контейнер, добавляя в него вызов метода и параметры для метода
-$container->extend( RouterInterface::class )
-	->addMethodCall( 'registerRoutes', [new ArrayArgument( $routes )] );
+$container->extend(RouterInterface::class)
+    ->addMethodCall('registerRoutes', [new ArrayArgument($routes)]);
+
+// добавляем обработку Middleware
+$container->add(RequestHandlerInterface::class, RequestHandler::class)
+    ->addArgument($container);
 
 // добавляем в контейнер Kernel
-$container->add( Kernel::class )
-	->addArgument( RouterInterface::class )
-	->addArgument( $container );
+$container->add(Kernel::class)
+    ->addArguments([
+        RouterInterface::class,
+        $container,
+        RequestHandlerInterface::class
+    ]);
 
 // добавляем загрузчик шаблонизатора twig в контейнер
-$container->addShared( 'twig-loader', FilesystemLoader::class )
-	->addArgument( new StringArgument( $viewsPath ) );
+$container->addShared(SessionInterface::class, Session::class);
 
-$container->addShared( 'twig', Environment::class )
-	->addArgument( 'twig-loader' );
+$container->add('twig-factory', TwigFactory::class)
+    ->addArguments([
+        new StringArgument($viewsPath),
+        SessionInterface::class
+    ]);
+
+$container->addShared('twig', function () use ($container) {
+    return $container->get('twig-factory')->create();
+});
 
 // подключаем абстрактный контроллер
-$container->inflector( AbstractController::class )
-	->invokeMethod( 'setContainer', [$container] );
+$container->inflector(AbstractController::class)
+    ->invokeMethod('setContainer', [$container]);
 
 // добавляем подключение к базе данных
-$container->add( ConnectionFactory::class )
-	->addArgument( new StringArgument( $databaseUrl ) );
+$container->add(ConnectionFactory::class)
+    ->addArgument(new StringArgument($databaseUrl));
 
-$container->addShared( Connection::class, function () use ( $container )
+$container->addShared(Connection::class, function () use ($container)
 : Connection {
-	return $container->get( ConnectionFactory::class )->create();
-} );
+    return $container->get(ConnectionFactory::class)->create();
+});
 
-$container->add( Application::class )
-	->addArgument( $container );
+$container->add(Application::class)
+    ->addArgument($container);
 
 // добавляем в контейнер консоль-Kernel
-$container->add( ConsoleKernel::class )
-	->addArgument( $container )
-	->addArgument( Application::class );
+$container->add(ConsoleKernel::class)
+    ->addArgument($container)
+    ->addArgument(Application::class);
 
-$container->add( 'console:migrate', MigrateCommand::class )
-	->addArgument( Connection::class )
-	->addArgument( new StringArgument( BASE_PATH . '/database/migrations' ) );
+$container->add('console:migrate', MigrateCommand::class)
+    ->addArgument(Connection::class)
+    ->addArgument(new StringArgument(BASE_PATH . '/database/migrations'));
+
+$container->add(RouterDispatch::class)
+    ->addArguments([
+        RouterInterface::class,
+        $container
+    ]);
 
 return $container;

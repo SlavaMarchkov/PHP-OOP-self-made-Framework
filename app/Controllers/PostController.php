@@ -6,14 +6,15 @@ use App\Entities\Post;
 use App\Services\PostService;
 use Pmguru\Framework\Controllers\AbstractController;
 use Pmguru\Framework\Http\Exceptions\NotFoundException;
-use Pmguru\Framework\Http\Request;
+use Pmguru\Framework\Http\RedirectResponse;
 use Pmguru\Framework\Http\Response;
+use Pmguru\Framework\Session\SessionInterface;
 
 class PostController extends AbstractController
 {
 	
 	public function __construct(
-		private PostService $service
+		private readonly PostService $service
 	)
 	{
 	}
@@ -40,13 +41,17 @@ class PostController extends AbstractController
 	}
 	
 	public function store()
-	{
+    : RedirectResponse
+    {
 		$post = Post::create(
 			$this->request->postData['title'],
 			$this->request->postData['body'],
 		);
-		$post = $this->service->save( $post );
-		dd( $post );
+		
+        $post = $this->service->save( $post );
+        $this->request->getSession()->setFlash('success', 'Пост успешно добавлен!');
+		
+		return new RedirectResponse( "/posts/{$post->getId()}" );
 	}
 	
 }
