@@ -1,0 +1,77 @@
+{% extends 'layouts/default.html.twig' %}
+
+{% block main %}
+    <div class="bg-body-tertiary p-5 rounded">
+        {% if session().hasFlash('errors') %}
+            <div class="alert alert-danger">
+                <ul class="m-0">
+                    {% for error in session().getFlash('errors') %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if session().hasFlash('success') %}
+            <div class="alert alert-success">
+                {% for message in session().getFlash('success') %}
+                    <p class="mb-0">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form method="post" action="/register">
+            <div class="mb-3">
+                <label for="name" class="form-label">Имя</label>
+                <input
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        id="name"
+                        aria-describedby="nameHelp"
+                        value="Вячеслав Марчков"
+                        required
+                >
+                <div id="nameHelp" class="form-text">Введите имя.</div>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input
+                        type="email"
+                        name="email"
+                        class="form-control"
+                        id="email"
+                        aria-describedby="emailHelp"
+                        value="slavamarchkov@gmail.com"
+                        required
+                >
+                <div id="emailHelp" class="form-text">Введите email.</div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Пароль</label>
+                <input
+                        type="password"
+                        name="password"
+                        class="form-control"
+                        id="password"
+                        aria-describedby="passwordHelp"
+                        value="slavamarchkov@gmail.com"
+                        required
+                >
+                <div id="passwordHelp" class="form-text">Введите пароль.</div>
+            </div>
+            <div class="mb-3">
+                <label for="password_confirmation" class="form-label">Подтверждение пароля</label>
+                <input
+                        type="password"
+                        name="password_confirmation"
+                        class="form-control"
+                        id="password_confirmation"
+                        aria-describedby="passwordConfirmationHelp"
+                        value="slavamarchkov@gmail.com"
+                        required
+                >
+                <div id="passwordConfirmationHelp" class="form-text">Пароли должны совпадать.</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+    </div>
+{% endblock %}

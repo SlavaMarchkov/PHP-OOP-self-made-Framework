@@ -44,8 +44,8 @@ class PostController extends AbstractController
     : RedirectResponse
     {
 		$post = Post::create(
-			$this->request->postData['title'],
-			$this->request->postData['body'],
+			$this->request->input('title'),
+			$this->request->input('body'),
 		);
 		
         $post = $this->service->save( $post );

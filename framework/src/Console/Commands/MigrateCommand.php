@@ -31,12 +31,12 @@ class MigrateCommand implements CommandInterface
 	: int
 	{
 		try {
-			$this->connection->setAutoCommit(false);
+			// $this->connection->setAutoCommit(false);
 			
 			// 1. Создать таблицу миграций (migrations), если таковая ещё не создана
 			$this->createMigrationsTable();
 			
-			$this->connection->beginTransaction();
+			// $this->connection->beginTransaction();
 			
 			// 2. Получить $appliedMigrations (миграции, которые уже есть в базе данных в таблице migrations)
 			$appliedMigrations = $this->getAppliedMigrations();
@@ -68,14 +68,14 @@ class MigrateCommand implements CommandInterface
 				echo 'SQL query executed' . PHP_EOL;
 			}
 			
-			$this->connection->commit();
+			// $this->connection->commit();
 			
 		} catch ( \Throwable $exception ) {
-			$this->connection->rollBack();
+			// $this->connection->rollBack();
 			throw new \Exception( $exception );
 		}
 		
-		$this->connection->setAutoCommit(true);
+		// $this->connection->setAutoCommit(true);
 		return 0;
 	}
 	

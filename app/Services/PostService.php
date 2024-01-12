@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Entities\Post;
+use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Pmguru\Framework\Http\Exceptions\NotFoundException;
 
 class PostService
@@ -14,8 +16,11 @@ class PostService
 	)
 	{
 	}
-	
-	public function save( Post $post )
+    
+    /**
+     * @throws Exception
+     */
+    public function save( Post $post )
 	: Post
 	{
 		$queryBuilder = $this->connection->createQueryBuilder();
@@ -38,8 +43,12 @@ class PostService
 		
 		return $post;
 	}
-	
-	public function find( int $id )
+    
+    /**
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function find( int $id )
 	: ?Post
 	{
 		$queryBuilder = $this->connection->createQueryBuilder();
@@ -61,13 +70,14 @@ class PostService
 			title: $post['title'],
 			body: $post['body'],
 			id: $post['id'],
-			createdAt: new \DateTimeImmutable( $post['created_at'] ),
+			createdAt: new DateTimeImmutable( $post['created_at'] ),
 		);
 	}
-	
-	/**
-	 * @throws NotFoundException
-	 */
+    
+    /**
+     * @throws NotFoundException
+     * @throws Exception
+     */
 	public function findOrFail( int $id )
 	: Post
 	{
