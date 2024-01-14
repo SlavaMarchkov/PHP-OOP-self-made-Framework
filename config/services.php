@@ -1,10 +1,13 @@
 <?php
 
+use App\Services\UserService;
 use Doctrine\DBAL\Connection;
 use League\Container\Argument\Literal\ArrayArgument;
 use League\Container\Argument\Literal\StringArgument;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
+use Pmguru\Framework\Authentication\SessionAuthentication;
+use Pmguru\Framework\Authentication\SessionAuthInterface;
 use Pmguru\Framework\Console\Application;
 use Pmguru\Framework\Console\Commands\MigrateCommand;
 use Pmguru\Framework\Console\Kernel as ConsoleKernel;
@@ -105,6 +108,12 @@ $container->add(RouterDispatch::class)
     ->addArguments([
         RouterInterface::class,
         $container
+    ]);
+
+$container->add(SessionAuthInterface::class, SessionAuthentication::class)
+    ->addArguments([
+        UserService::class,
+        SessionInterface::class
     ]);
 
 return $container;

@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\User;
+use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Pmguru\Framework\Authentication\AuthUserInterface;
+use Pmguru\Framework\Authentication\UserServiceInterface;
 
-final class UserService
+final class UserService implements UserServiceInterface
 {
     
     public function __construct(
@@ -42,6 +45,36 @@ final class UserService
         $user->setId($id);
         
         return $user;
+    }
+    
+    /**
+     * @param string $email
+     * @return AuthUserInterface|null
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function findByEmail(string $email)
+    : ?AuthUserInterface {
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $result = $queryBuilder->select('*')
+            ->from('users')
+            ->where('email = :email')
+            ->setParameter('email', $email)
+            ->executeQuery();
+        
+        $user = $result->fetchAssociative();
+        
+        if (!$user) {
+            return null;
+        }
+        
+        return User::create(
+            email: $user['email'],
+            password: $user['password'],
+            createdAt: new DateTimeImmutable($user['created_at']),
+            name: $user['name'],
+            id: $user['id']
+        );
     }
     
 }

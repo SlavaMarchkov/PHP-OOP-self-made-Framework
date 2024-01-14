@@ -1,0 +1,14 @@
+{% extends 'layouts/default.html.twig' %}
+
+{% block main %}
+    <div class="bg-body-tertiary p-5 rounded">
+        {% if session().hasFlash('success') %}
+            <div class="alert alert-success">
+                {% for message in session().getFlash('success') %}
+                    <p class="mb-0">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <h1>Dashboard</h1>
+    </div>
+{% endblock %}

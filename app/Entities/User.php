@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Entities;
 
 use DateTimeImmutable;
+use Pmguru\Framework\Authentication\AuthUserInterface;
 
-class User
+class User implements AuthUserInterface
 {
     
     public function __construct(
@@ -31,7 +32,7 @@ class User
     }
     
     public function getId()
-    : ?int
+    : int
     {
         return $this->id;
     }
