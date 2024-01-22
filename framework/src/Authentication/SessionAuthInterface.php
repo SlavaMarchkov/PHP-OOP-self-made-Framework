@@ -17,4 +17,8 @@ interface SessionAuthInterface
     public function getUser()
     : AuthUserInterface;
     
+    // проверяет, авторизирован ли пользователь или нет
+    public function check()
+    : bool;
+    
 }

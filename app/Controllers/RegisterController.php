@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Forms\User\RegisterForm;
 use App\Services\UserService;
 use Doctrine\DBAL\Exception;
+use Pmguru\Framework\Authentication\SessionAuthInterface;
 use Pmguru\Framework\Controllers\AbstractController;
 use Pmguru\Framework\Http\RedirectResponse;
 use Pmguru\Framework\Http\Response;
@@ -16,6 +17,7 @@ final class RegisterController extends AbstractController
     
     public function __construct(
         private readonly UserService $userService,
+        private readonly SessionAuthInterface $auth,
     )
     {
     }
@@ -30,6 +32,7 @@ final class RegisterController extends AbstractController
      * @throws Exception
      */
     public function register()
+    : RedirectResponse
     {
         // 1. Создаем модель формы
         $form = new RegisterForm($this->userService);
@@ -53,12 +56,13 @@ final class RegisterController extends AbstractController
         $user = $form->save();
         
         // 4. Добавить сообщение об успешной регистрации
-        $this->request->getSession()->setFlash('success', "Пользователь {$user->getEmail()} успешно зарегистрирован");
+        $this->request->getSession()->setFlash('success', "Пользователь {$user->getEmail()} успешно зарегистрирован.");
         
         // 5. Войти в систему под пользователем
+        $this->auth->login($user);
         
         // 6. Перенаправить на нужную страницу
-        return new RedirectResponse('/register');
+        return new RedirectResponse('/dashboard');
     }
     
 }

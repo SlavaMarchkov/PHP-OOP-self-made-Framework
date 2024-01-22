@@ -13,7 +13,7 @@ final class LoginController extends AbstractController
 {
     
     public function __construct(
-        private readonly SessionAuthInterface $sessionAuth,
+        private readonly SessionAuthInterface $auth,
     )
     {
     }
@@ -27,18 +27,26 @@ final class LoginController extends AbstractController
     public function login()
     : RedirectResponse
     {
-        $isAuth = $this->sessionAuth->authenticate(
+        $isAuth = $this->auth->authenticate(
             $this->request->input('email'),
             $this->request->input('password'),
         );
         
         if (!$isAuth) {
-            $this->request->getSession()->setFlash('errors', 'Неверный email или пароль!');
+            $this->request->getSession()->setFlash('errors', 'Неверный email или пароль.');
             return new RedirectResponse('/login');
         }
         
-        $this->request->getSession()->setFlash('success', 'Вход выполнен успешно!');
+        $this->request->getSession()->setFlash('success', 'Вход выполнен успешно.');
         return new RedirectResponse('/dashboard');
+    }
+    
+    public function logout()
+    : RedirectResponse
+    {
+        $this->auth->logout();
+        $this->request->getSession()->setFlash('success', "Вы вышли из аккаунта.");
+        return new RedirectResponse('/login');
     }
     
 }

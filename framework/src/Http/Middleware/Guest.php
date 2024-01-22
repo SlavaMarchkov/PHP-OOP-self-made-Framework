@@ -10,7 +10,7 @@ use Pmguru\Framework\Http\Request;
 use Pmguru\Framework\Http\Response;
 use Pmguru\Framework\Session\SessionInterface;
 
-class Authenticate implements MiddlewareInterface
+class Guest implements MiddlewareInterface
 {
     
     
@@ -25,9 +25,8 @@ class Authenticate implements MiddlewareInterface
     : Response {
         $this->session->start();
         
-        if (!$this->auth->check()) {
-            $this->session->setFlash('errors', 'To get started, you have to sign in first');
-            return new RedirectResponse('/login');
+        if ($this->auth->check()) {
+            return new RedirectResponse('/dashboard');
         }
         
         return $handler->handle($request);

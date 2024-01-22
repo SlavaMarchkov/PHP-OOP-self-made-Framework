@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pmguru\Framework\Http\Middleware;
 
+use JetBrains\PhpStorm\NoReturn;
 use Pmguru\Framework\Http\Exceptions\NotFoundException;
 use Pmguru\Framework\Http\Request;
 use Pmguru\Framework\Http\Response;
@@ -15,8 +16,8 @@ final class RequestHandler implements RequestHandlerInterface
 {
     
     private array $middleware = [
+        ExtractRouteInfo::class,
         StartSession::class,
-        Authenticate::class,
         RouterDispatch::class,
     ];
     
@@ -49,6 +50,15 @@ final class RequestHandler implements RequestHandlerInterface
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
             throw new NotFoundException($e->getMessage(), 500);
         }
+    }
+    
+    /**
+     * @param array $middleware
+     * @return void
+     */
+    #[NoReturn] public function injectMiddleware(array $middleware)
+    : void {
+        array_splice($this->middleware, 0, 0, $middleware);
     }
     
 }

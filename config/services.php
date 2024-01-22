@@ -14,6 +14,7 @@ use Pmguru\Framework\Console\Kernel as ConsoleKernel;
 use Pmguru\Framework\Controllers\AbstractController;
 use Pmguru\Framework\Dbal\ConnectionFactory;
 use Pmguru\Framework\Http\Kernel;
+use Pmguru\Framework\Http\Middleware\ExtractRouteInfo;
 use Pmguru\Framework\Http\Middleware\RequestHandler;
 use Pmguru\Framework\Http\Middleware\RequestHandlerInterface;
 use Pmguru\Framework\Http\Middleware\RouterDispatch;
@@ -50,10 +51,6 @@ $container->add('APP_ENV', new StringArgument($appEnv));
 // добавляем в него Router
 $container->add(RouterInterface::class, Router::class);
 
-// расширяем контейнер, добавляя в него вызов метода и параметры для метода
-$container->extend(RouterInterface::class)
-    ->addMethodCall('registerRoutes', [new ArrayArgument($routes)]);
-
 // добавляем обработку Middleware
 $container->add(RequestHandlerInterface::class, RequestHandler::class)
     ->addArgument($container);
@@ -72,7 +69,8 @@ $container->addShared(SessionInterface::class, Session::class);
 $container->add('twig-factory', TwigFactory::class)
     ->addArguments([
         new StringArgument($viewsPath),
-        SessionInterface::class
+        SessionInterface::class,
+        SessionAuthInterface::class
     ]);
 
 $container->addShared('twig', function () use ($container) {
@@ -115,5 +113,8 @@ $container->add(SessionAuthInterface::class, SessionAuthentication::class)
         UserService::class,
         SessionInterface::class
     ]);
+
+$container->add(ExtractRouteInfo::class)
+    ->addArgument(new ArrayArgument($routes));
 
 return $container;

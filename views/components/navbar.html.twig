@@ -18,8 +18,14 @@
                 </li>
             </ul>
             <div class="d-flex gap-2">
-                <a href="/login" class="btn btn-primary">Вход</a>
-                <a href="/register" class="btn btn-success">Регистрация</a>
+                {% if auth().check() %}
+                    <form action="/logout" method="post">
+                        <button type="submit" class="btn btn-danger">Выход</button>
+                    </form>
+                {% else %}
+                    <a href="/login" class="btn btn-primary">Вход</a>
+                    <a href="/register" class="btn btn-success">Регистрация</a>
+                {% endif %}
             </div>
         </div>
     </div>
