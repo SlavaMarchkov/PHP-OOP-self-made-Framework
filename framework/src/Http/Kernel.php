@@ -2,12 +2,12 @@
 
 namespace Pmguru\Framework\Http;
 
-use Doctrine\DBAL\Connection;
 use Exception;
 use League\Container\Container;
+use Pmguru\Framework\Event\EventDispatcher;
+use Pmguru\Framework\Http\Events\ResponseEvent;
 use Pmguru\Framework\Http\Exceptions\HttpException;
 use Pmguru\Framework\Http\Middleware\RequestHandlerInterface;
-use Pmguru\Framework\Routing\RouterInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -21,9 +21,9 @@ class Kernel
      * @throws NotFoundExceptionInterface
      */
     public function __construct(
-        private readonly RouterInterface $router,
         private readonly Container $container,
-        private RequestHandlerInterface $requestHandler
+        private readonly RequestHandlerInterface $requestHandler,
+        private readonly EventDispatcher $eventDispatcher,
     ) {
         $this->appEnv = $this->container->get('APP_ENV');
     }
@@ -45,6 +45,9 @@ class Kernel
         } catch (Exception $e) {
             $response = $this->createExceptionResponse($e);
         }
+        
+        // $response->setStatusCode(500);
+        $this->eventDispatcher->dispatch(new ResponseEvent($request, $response));
         
         return $response;
     }

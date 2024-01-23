@@ -6,8 +6,9 @@ namespace App\Entities;
 
 use DateTimeImmutable;
 use Pmguru\Framework\Authentication\AuthUserInterface;
+use Pmguru\Framework\Dbal\Entity;
 
-class User implements AuthUserInterface
+class User extends Entity implements AuthUserInterface
 {
     
     public function __construct(

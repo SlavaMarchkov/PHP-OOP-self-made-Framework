@@ -3,8 +3,9 @@
 namespace App\Entities;
 
 use DateTimeImmutable;
+use Pmguru\Framework\Dbal\Entity;
 
-class Post
+class Post extends Entity
 {
 	
 	public function __construct(

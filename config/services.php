@@ -13,6 +13,7 @@ use Pmguru\Framework\Console\Commands\MigrateCommand;
 use Pmguru\Framework\Console\Kernel as ConsoleKernel;
 use Pmguru\Framework\Controllers\AbstractController;
 use Pmguru\Framework\Dbal\ConnectionFactory;
+use Pmguru\Framework\Event\EventDispatcher;
 use Pmguru\Framework\Http\Kernel;
 use Pmguru\Framework\Http\Middleware\ExtractRouteInfo;
 use Pmguru\Framework\Http\Middleware\RequestHandler;
@@ -55,12 +56,14 @@ $container->add(RouterInterface::class, Router::class);
 $container->add(RequestHandlerInterface::class, RequestHandler::class)
     ->addArgument($container);
 
+$container->addShared(EventDispatcher::class);
+
 // добавляем в контейнер Kernel
 $container->add(Kernel::class)
     ->addArguments([
-        RouterInterface::class,
         $container,
-        RequestHandlerInterface::class
+        RequestHandlerInterface::class,
+        EventDispatcher::class,
     ]);
 
 // добавляем загрузчик шаблонизатора twig в контейнер

@@ -6,16 +6,16 @@ namespace App\Services;
 
 use App\Entities\User;
 use DateTimeImmutable;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Pmguru\Framework\Authentication\AuthUserInterface;
 use Pmguru\Framework\Authentication\UserServiceInterface;
+use Pmguru\Framework\Dbal\EntityService;
 
 final class UserService implements UserServiceInterface
 {
     
     public function __construct(
-        private readonly Connection $connection,
+        private readonly EntityService $service,
     ) {
     }
     
@@ -24,7 +24,7 @@ final class UserService implements UserServiceInterface
      */
     public function save(User $user)
     : User {
-        $queryBuilder = $this->connection->createQueryBuilder();
+        $queryBuilder = $this->service->getConnection()->createQueryBuilder();
         $queryBuilder
             ->insert('users')
             ->values([
@@ -41,7 +41,7 @@ final class UserService implements UserServiceInterface
             ])
             ->executeQuery();
         
-        $id = (int)$this->connection->lastInsertId();
+        $id = $this->service->save($user);
         $user->setId($id);
         
         return $user;
@@ -55,7 +55,7 @@ final class UserService implements UserServiceInterface
      */
     public function findByEmail(string $email)
     : ?AuthUserInterface {
-        $queryBuilder = $this->connection->createQueryBuilder();
+        $queryBuilder = $this->service->getConnection()->createQueryBuilder();
         $result = $queryBuilder->select('*')
             ->from('users')
             ->where('email = :email')
