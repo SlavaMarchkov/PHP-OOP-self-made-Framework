@@ -13,9 +13,11 @@ class ContentLengthListener
     : void {
         $response = $event->getResponse();
         
-        if (!array_key_exists('Content-Length', $response->getHeaders())) {
-            $response->setHeader('Content-Length', strlen($response->getContent()));
+        if (!array_key_exists('X-Content-Length', $response->getHeaders())) {
+            $response->setHeader('X-Content-Length', strlen($response->getContent()));
         }
+        
+        // dump('here');
     }
     
 }

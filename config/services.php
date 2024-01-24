@@ -28,17 +28,21 @@ use Symfony\Component\Dotenv\Dotenv;
 
 // подключение переменных окружения
 $dotenv = new Dotenv();
-$dotenv->load(BASE_PATH . '/.env');
+$dotenv->load(dirname(__DIR__) . '/.env');
 
 // Application parameters
-$routes = include BASE_PATH . '/routes/web.php';
+$basePath = dirname(__DIR__);
+$routes = include $basePath . '/routes/web.php';
 $appEnv = $_ENV['APP_ENV'] ?? 'local';
-$viewsPath = BASE_PATH . '/views';
+$viewsPath = $basePath . '/views';
 $databaseUrl = 'pdo-mysql://root@localhost:3306/php_framework?charset=utf8mb4';
 
 // Application services:
 // создаем контейнер
 $container = new Container();
+
+// добавляем переменную базового пути
+$container->add('base-path', new StringArgument($basePath));
 
 // подключаем делегирование
 $container->delegate(new ReflectionContainer(true));
@@ -103,7 +107,7 @@ $container->add(ConsoleKernel::class)
 
 $container->add('console:migrate', MigrateCommand::class)
     ->addArgument(Connection::class)
-    ->addArgument(new StringArgument(BASE_PATH . '/database/migrations'));
+    ->addArgument(new StringArgument($basePath . '/database/migrations'));
 
 $container->add(RouterDispatch::class)
     ->addArguments([

@@ -6,32 +6,23 @@ require_once BASE_PATH . '/vendor/autoload.php';
 use League\Container\Container;
 use Pmguru\Framework\Http\Kernel;
 use Pmguru\Framework\Http\Request;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 $request = Request::createFromGlobals();
 
 /** @var Container $container */
 $container = require BASE_PATH . '/config/services.php';
 
-$eventDispatcher = $container->get(\Pmguru\Framework\Event\EventDispatcher::class);
-$eventDispatcher
-    ->addListener(
-        \Pmguru\Framework\Http\Events\ResponseEvent::class,
-        new \App\Listeners\InternalErrorListener()
-    )
-    ->addListener(
-        \Pmguru\Framework\Http\Events\ResponseEvent::class,
-        new \App\Listeners\ContentLengthListener()
-    )
-    ->addListener(
-        \Pmguru\Framework\Dbal\Event\EntityPersist::class,
-        new \App\Listeners\HandleEntityListener()
-    );
+// подключаем сервис-провайдеры
+require_once BASE_PATH . '/bootstrap/bootstrap.php';
 
-$kernel = $container->get(Kernel::class);
-
-$response = $kernel->handle($request);
-$response->send();
-
-$kernel->terminate($request, $response);
+try {
+    $kernel = $container->get(Kernel::class);
+    $response = $kernel->handle($request);
+    $response->send();
+    $kernel->terminate($request, $response);
+} catch (NotFoundExceptionInterface|ContainerExceptionInterface|Exception $e) {
+}
 
 // dump($_SESSION);
